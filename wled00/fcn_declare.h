@@ -263,6 +263,7 @@ void handlePlaylist();
 void serializePlaylist(JsonObject obj);
 
 //presets.cpp
+extern volatile byte presetToApply;
 const char *getPresetsFileName(bool persistent = true);
 bool presetNeedsSaving();
 void initPresetsFile();
