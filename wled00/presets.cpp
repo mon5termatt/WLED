@@ -8,7 +8,7 @@
 static char *tmpRAMbuffer = nullptr;
 #endif
 
-static volatile byte presetToApply = 0;
+volatile byte presetToApply = 0;
 static volatile byte callModeToApply = 0;
 static volatile byte presetToSave = 0;
 static volatile int8_t saveLedmap = -1;

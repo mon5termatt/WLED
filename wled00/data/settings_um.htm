@@ -34,13 +34,21 @@
 			urows="";
 			if (isO(umCfg)) {
 				for (const [k,o] of Object.entries(umCfg)) {
-					urows += `<div class="sec"><h3>${k}</h3>`;
+					const secId = "um_" + String(k).replace(/[^A-Za-z0-9_-]/g, "_");
+					urows += `<div class="sec" id="${secId}"><h3>${k}</h3>`;
 					addField(k,'unknown',o);
 					urows += `</div>`;
 				}
 			}
 			if (urows==="") urows = "Usermods configuration not found.<br>Press <i>Save</i> to initialize defaults.";
 			gId("um").innerHTML = urows;
+			{
+				const h = (location.hash || "").replace(/^#/, "");
+				if (h) {
+					const el = gId(h);
+					if (el) setTimeout(()=>{ el.scrollIntoView({ block: "start", behavior: "smooth" }); }, 120);
+				}
+			}
 			loadJS(getURL('/settings/s.js?p=8'), false, ()=>{
 				d.max_gpio = 50;
 				d.um_p = [];
