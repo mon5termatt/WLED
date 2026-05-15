@@ -1,6 +1,7 @@
 //page js
 var loc = false, locip, locproto = "http:";
 var isOn = false, nlA = false, isLv = false, isInfo = false, isNodes = false, syncSend = false/*, syncTglRecv = true*/;
+var hlSense = false, hlOn = false;
 var hasWhite = false, hasRGB = false, hasCCT = false, has2D = false;
 var nlDur = 60, nlTar = 0;
 var nlMode = false;
@@ -1284,11 +1285,25 @@ function updatePA()
 	}
 }
 
+function updateHeadlightButton()
+{
+	var btn = gId('buttonHeadlights');
+	if (!btn) return;
+	if (!hlSense) {
+		btn.className = '';
+		btn.title = 'Headlight sense disabled — open settings';
+		return;
+	}
+	btn.className = hlOn ? 'hl-on' : 'hl-off';
+	btn.title = hlOn ? 'Headlights ON (GPIO sense)' : 'Headlights OFF (GPIO sense)';
+}
+
 function updateUI()
 {
 	gId('buttonPower').className = (isOn) ? 'active':'';
 	gId('buttonNl').className = (nlA) ? 'active':'';
 	gId('buttonSync').className = (syncSend) ? 'active':'';
+	updateHeadlightButton();
 
 	updateSelectedFx();
 	updateSelectedPalette(selectedPal); // must be after updateSelectedFx() to un-hide color slots for * palettes
@@ -1469,6 +1484,14 @@ function readState(s,command=false)
 	isOn = s.on;
 	gId('sliderBri').value = s.bri;
 	nlA = s.nl.on;
+	var rlp = s.RestoreLastPreset;
+	if (rlp) {
+		hlSense = !!rlp.sense;
+		hlOn = !!rlp.on;
+	} else {
+		hlSense = false;
+		hlOn = false;
+	}
 	nlDur = s.nl.dur;
 	nlTar = s.nl.tbri;
 	nlFade = s.nl.fade;

@@ -323,6 +323,17 @@ button {
 	color: var(--c-f);
 }
 
+/* Headlight GPIO sense (restore_last_preset usermod) */
+#buttonHeadlights.hl-on {
+	background-color: var(--c-tbh);
+}
+#buttonHeadlights.hl-on i.icons {
+	color: var(--c-y) !important;
+}
+#buttonHeadlights.hl-off i.icons {
+	color: var(--c-6) !important;
+}
+
 .active {
 	background-color: var(--c-6) !important;
 	color: var(--c-f);

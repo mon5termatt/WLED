@@ -45,6 +45,14 @@ The pin is registered with `PinManager` as input. If allocation fails (pin alrea
 
 On the main WLED UI **top bar**, use **Headlights** (sun icon) to open **Usermods** scrolled to the **RestoreLastPreset** section (headlight GPIO, ignored presets, etc.).
 
+When headlight GPIO sense is enabled, the icon color tracks the switch: **amber** = headlights on, **dim gray** = off (updates with WebSocket / JSON state). If sense is disabled (`headlightPin` = -1), the icon stays the default style.
+
+### Sharing GPIO with a WLED button (same optocoupler)
+
+**Yes — one wire to one GPIO is fine.** WLED’s button already owns that pin in software; this usermod will **not** allocate it again if it sees `PinOwner::Button` on the same GPIO. It only **`digitalRead()`**s the line (same as the button code). Set **`headlightPin`** to the **same GPIO** as your button (e.g. **2**). JSON may include `"shared": true` when sharing.
+
+Button type sets polarity automatically for shared pins: **Push / Switch** → active LOW; **Push active high / PIR** → active HIGH. You can still override with **`headlightOffWhenLow`** in config.
+
 Add the module folder name to `custom_usermods` (for example in `platformio_override.ini` next to any other usermods you already use):
 
 ```ini

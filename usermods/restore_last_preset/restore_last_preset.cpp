@@ -30,6 +30,7 @@ class RestoreLastPresetUsermod : public Usermod {
   bool headlightOffWhenLow = false;
   bool headlightPullup = true;
   bool headlightPinOk = false;
+  bool headlightPinShared = false; // true: GPIO owned by WLED Button, we only digitalRead()
 
   static const char _name[];
   static const char _enabled[];
@@ -54,6 +55,44 @@ class RestoreLastPresetUsermod : public Usermod {
     return headlightOffWhenLow ? (v == LOW) : (v == HIGH);
   }
 
+  bool headlightsOn() const {
+    return headlightPinOk && headlightSensePin >= 0 && !headlightsOffInhibit();
+  }
+
+  // If allocate fails because a Button already uses this GPIO, share the line (same optocoupler).
+  void initHeadlightSense() {
+    headlightPinOk = false;
+    headlightPinShared = false;
+    if (headlightSensePin < 0) return;
+
+    const uint8_t pin = (uint8_t)headlightSensePin;
+    if (PinManager::allocatePin(pin, false, PinOwner::UM_Unspecified)) {
+      pinMode(pin, headlightPullup ? INPUT_PULLUP : INPUT);
+      headlightPinOk = true;
+      return;
+    }
+    if (PinManager::isPinAllocated(pin, PinOwner::Button)) {
+      headlightPinOk = true;
+      headlightPinShared = true;
+      for (const Button &btn : buttons) {
+        if (btn.pin != headlightSensePin || btn.type == BTN_TYPE_NONE) continue;
+        switch (btn.type) {
+          case BTN_TYPE_PUSH:
+          case BTN_TYPE_SWITCH:
+            headlightOffWhenLow = false; // active LOW (typical opto + pull-up)
+            break;
+          case BTN_TYPE_PUSH_ACT_HIGH:
+          case BTN_TYPE_PIR_SENSOR:
+            headlightOffWhenLow = true;  // active HIGH
+            break;
+          default:
+            break;
+        }
+        break;
+      }
+    }
+  }
+
   void loadIgnoredFromConfig(JsonObject& top) {
     JsonArray arr = top[FPSTR(_ignoredPresets)].as<JsonArray>();
     if (arr.isNull()) {
@@ -75,13 +114,7 @@ class RestoreLastPresetUsermod : public Usermod {
   void setup() override {
     bootMillis = millis();
     bootIgnoreUntil = bootMillis + 3000;
-    headlightPinOk = false;
-    if (headlightSensePin >= 0) {
-      if (PinManager::allocatePin((uint8_t)headlightSensePin, false, PinOwner::UM_Unspecified)) {
-        pinMode((uint8_t)headlightSensePin, headlightPullup ? INPUT_PULLUP : INPUT);
-        headlightPinOk = true;
-      }
-    }
+    initHeadlightSense();
     if (enabled && restoreOnBoot) {
       if (persistedPreset > 0 && persistedPreset < 251 && !isIgnoredPreset(persistedPreset))
         applyPreset(persistedPreset, CALL_MODE_INIT);
@@ -120,6 +153,17 @@ class RestoreLastPresetUsermod : public Usermod {
       if (saveAtMs == 0) saveAtMs = now + saveDebounceMs;
     } else {
       saveAtMs = 0;
+    }
+  }
+
+  void addToJsonState(JsonObject& root) override {
+    if (!enabled) return;
+    JsonObject um = root.createNestedObject(FPSTR(_name));
+    const bool sense = headlightPinOk && headlightSensePin >= 0;
+    um["sense"] = sense;
+    if (sense) {
+      um["on"] = headlightsOn();
+      um["shared"] = headlightPinShared;
     }
   }
 
