@@ -2051,7 +2051,7 @@ void WS2812FX::makeAutoSegments(bool forceReset) {
       _segments.emplace_back(segStarts[i], segStops[i]);
     }
     for (size_t i = 0; i < _segments.size(); i++) {
-      _segments[i].colors[0] = DEFAULT_COLOR; // set color to default orange on all segments
+      _segments[i].colors[0] = bootColor; // startup color (cfg def.col), orange unless changed in LED settings
     }
     DEBUGFX_PRINTF_P(PSTR("%d auto segments created.\n"), _segments.size());
 

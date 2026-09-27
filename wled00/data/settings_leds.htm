@@ -1123,7 +1123,9 @@ Swap: <select id="xw${s}" name="XW${s}">
 	<div class="sec">
 		<h3>Power up</h3>
 		Turn LEDs on after power up/reset: <input type="checkbox" name="BO"><br>
-		Bootup brightness: <input name="CA" type="number" class="m" min="1" max="255" required> (1-255)<br><br>
+		Bootup brightness: <input name="CA" type="number" class="m" min="1" max="255" required> (1-255)<br>
+		Startup color: <input name="BC" type="color" value="#ffa000"><br>
+		<small>Shown at power-up when no boot preset is applied. A lockup during startup leaves the LEDs on this color.</small><br><br>
 		Apply preset <input name="BP" type="number" class="m" min="0" max="250" required> at boot (0 = none)<br><br>
 	</div>
 	<div class="sec">

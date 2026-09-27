@@ -440,6 +440,8 @@ void getSettingsJS(byte subPage, Print& settingsScript)
 
     printSetFormCheckbox(settingsScript,PSTR("BO"),turnOnAtBoot);
     printSetFormValue(settingsScript,PSTR("BP"),bootPreset);
+    snprintf_P(nS, sizeof(nS), PSTR("#%02x%02x%02x"), R(bootColor), G(bootColor), B(bootColor));
+    printSetFormValue(settingsScript,PSTR("BC"),nS);
 
     printSetFormCheckbox(settingsScript,PSTR("GB"),gammaCorrectBri);
     printSetFormCheckbox(settingsScript,PSTR("GC"),gammaCorrectCol);

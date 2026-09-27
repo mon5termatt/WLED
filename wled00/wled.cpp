@@ -674,9 +674,9 @@ void WLED::beginStrip()
   if (rlyPin < 0) strip.show(); // ensure LEDs are off if no relay is used
 
   // Note on how bootup behaviour works:
-  // if turnOnAtBoot is false: strip is set to black. It will fade in to startup brightness and orange when turned on
+  // if turnOnAtBoot is false: strip is set to black. It will fade in to startup brightness and the startup color when turned on
   //   if a bootup preset is set, it will fade to that preset if it has "on:true" set (to default brightness) or to that preset's brightness if set
-  // if turnOnAtBoot is true: the LEDs will fade in to orange and default brightness
+  // if turnOnAtBoot is true: the LEDs will fade in to the startup color and default brightness
   //   if a bootup preset is set, it will start at the default brightness except if "fade" transition is used, then it will still fade from black
   // there is no way to have LEDs off at boot and upon turn-on have them immediatel jump to a target brightness but users can use a playlist to do that
 
@@ -691,11 +691,11 @@ void WLED::beginStrip()
     applyPreset(bootPreset, CALL_MODE_INIT);
   }
   else {
-    // set color to warm welcoming orange (aka DEFAULT_COLOR) if no preset loaded (will fade to this color once turned on)
-    colPri[0] = R(DEFAULT_COLOR);
-    colPri[1] = G(DEFAULT_COLOR);
-    colPri[2] = B(DEFAULT_COLOR);
-    colPri[3] = W(DEFAULT_COLOR);
+    // startup color (LED Settings → Power up) if no preset loaded (will fade to this color once turned on)
+    colPri[0] = R(bootColor);
+    colPri[1] = G(bootColor);
+    colPri[2] = B(bootColor);
+    colPri[3] = W(bootColor);
   }
 
   strip.setTransition(transitionDelayDefault);  // restore default transition time

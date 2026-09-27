@@ -396,6 +396,12 @@ void handleSettingsSet(AsyncWebServerRequest *request, byte subPage)
     turnOnAtBoot = request->hasArg(F("BO"));
     t = request->arg(F("BP")).toInt();
     if (t <= 250) bootPreset = t;
+    const String &bootCol = request->arg(F("BC"));
+    if (bootCol.length() == 7 && bootCol.charAt(0) == '#') {
+      char *end = nullptr;
+      unsigned long rgb = strtoul(bootCol.c_str() + 1, &end, 16);
+      if (end && *end == '\0') bootColor = RGBW32((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, 0);
+    }
     gammaCorrectBri = request->hasArg(F("GB"));
     gammaCorrectCol = request->hasArg(F("GC"));
     gammaCorrectVal = request->arg(F("GV")).toFloat();
